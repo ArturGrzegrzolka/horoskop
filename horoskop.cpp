@@ -23,7 +23,6 @@ class Cechy
 	string horoskop_link;
 };
 
-Cechy t_Funboy[10];
 Cechy Funboy; //obiekt Funboy opisany przez klase Cechy
 Cechy *pFunboy; //deklaracja wskaznika do obiektu
 
@@ -169,7 +168,7 @@ return lv_name;
 char f_SprawdzPlec (string v_name)
 {
 	const string v_imiemeskie[] = {"Barnaba", "Bonawentura", "Jarema", "Jona", "Kosma", "Dyzma"};
-	const string v_imiezenskie[] = {"Beatrycze", "DÅ¼anan", "Mariam", "Miriam", "Megi", "Noemi", "Rut", "Szarlin"};
+	const string v_imiezenskie[] = {"Beatrycze", "D¿anan", "Mariam", "Miriam", "Megi", "Noemi", "Rut", "Szarlin"};
 	int v_nietypoweimie = 0;
 	for (int i = 0; i < 6; i++)
 	{
@@ -379,149 +378,17 @@ void f_Zapisz_do_pliku ()
 		plik<<pFunboy->nazwa_dnia_urodzenia<<';';
 		plik<<pFunboy->znak_zodiaku<<';';
 		plik<<pFunboy->plec<<';';
-		plik<<pFunboy->horoskop_link<<';'<<endl;
+		plik<<pFunboy->horoskop_link<< endl;
 		plik.flush();
 	plik.close();
 }
-//-------------------------------------------------------------------------------------
-void f_ZapiszTabliceDoPliku ()
-{
-	fstream plik;
-	plik.open( "zodiak.txt", ios::out | ios::app );
-		for (int i=0; i<sizeof(t_Funboy)/sizeof(t_Funboy[0]); i++)
-		{	plik<<pFunboy[i].imie<<';';
-			plik<<pFunboy[i].rok_urodzenia<<';';
-			plik<<pFunboy[i].miesiac_urodzenia<<';';
-			plik<<pFunboy[i].dzien_urodzenia<<';';
-			plik<<pFunboy[i].nazwa_dnia_urodzenia<<';';
-			plik<<pFunboy[i].znak_zodiaku<<';';
-			plik<<pFunboy[i].plec<<';';
-			plik<<pFunboy[i].horoskop_link<<';'<<endl;
-		}	
-			plik.flush();
-			plik.close();
-}
-//-------------------------------------------------------------------------------------
-bool f_Wytnij_Zapisz(int vl_lp, string vl_linia)
-{	
-	string vl_LP, vl_birthdate, vl_day, vl_month, vl_year, vl_name, vl_dzienUrodzin, vl_zodiac;;
-	char vl_separator=';', vl_separator1='-', vl_gender;
-	int t_seperatory[2], vl_licznikSeparatorow =0, i, v_day, v_month, v_year;
-	bool vl_CzyPoprawneDane, vl_blad = false;
-	
-	for (i=0; i<vl_linia.length()-1; i++) //powtarzaj dopuki i<dlugosci linii
-	{	if (vl_linia[i]==vl_separator)
-		{	t_seperatory[vl_licznikSeparatorow]=i; //zbieranie informacji o pozycji separatora
-			vl_licznikSeparatorow++;} 
-	}
-	vl_name = vl_linia.substr(t_seperatory[0]+1,t_seperatory[1]-t_seperatory[0]-1);
-	vl_birthdate=vl_linia.substr(t_seperatory[1]+1,vl_linia.length()-1);
-	cout<< "vl_imie : "<<vl_name<<" vl_birthdate : "<<vl_birthdate<<endl;
-	
-	vl_licznikSeparatorow=0;
-	for (i=0; i<vl_birthdate.length()-1; i++) //powtarzaj dopuki i<dlugosci vl_birthdate
-	{	if (vl_birthdate[i]==vl_separator1)
-		{	t_seperatory[vl_licznikSeparatorow]=i; //zbieranie informacji o pozycji separatora1
-			vl_licznikSeparatorow++;} 
-	}
-	vl_year	= vl_birthdate.substr(0,t_seperatory[0]);
-	vl_month= vl_birthdate.substr(t_seperatory[0]+1,t_seperatory[1]-t_seperatory[0]-1);
-	vl_day	= vl_birthdate.substr(t_seperatory[1]+1,vl_birthdate.length()-1);
-	
-	cout<< "vl_year : "<<vl_year<<" vl_month : "<<vl_month<<" vl_day : "<<vl_day<<endl;
 
-	sscanf(vl_year.c_str(), "%d", &v_year);
-	sscanf(vl_month.c_str(), "%d", &v_month);
-	sscanf(vl_day.c_str(), "%d", &v_day);
-
-	//sprawdzam poprawnosc danych	
-	vl_blad = false;
-	vl_CzyPoprawneDane = f_CzyJestYearUrodzenia( v_year );
-	vl_blad = (vl_blad + vl_CzyPoprawneDane );
-	vl_CzyPoprawneDane = f_CzyJestMountUrodzenia( v_month );
-	vl_blad = (vl_blad + vl_CzyPoprawneDane );
-	vl_CzyPoprawneDane = f_CzyJestDayUrodzenia( v_day, v_month, v_year);
-	vl_blad = (vl_blad + vl_CzyPoprawneDane );
-	vl_CzyPoprawneDane = f_CzyPoprawneImie( vl_name) ;		//wywolanie funkcji do walidacji imienia czy np. user nie wpisal 1234...
-	vl_blad = (vl_blad + vl_CzyPoprawneDane );
-	//koniec sprawdzania poprawnosci danych	
-	
-	if (vl_blad==false)
-	{	vl_name = f_ImieInitCap(vl_name);						//initcap - niezaleznie od tego co user wpisal.	
-		vl_dzienUrodzin = f_OdgadnijDzienUrodzin(v_day, v_month, v_year);
-		vl_gender = f_SprawdzPlec(vl_name);
-		vl_zodiac = f_Zodiak(v_day, v_month);
-
-		t_Funboy[vl_lp].rok_urodzenia=v_year;
-		t_Funboy[vl_lp].miesiac_urodzenia=v_month;
-		t_Funboy[vl_lp].dzien_urodzenia=v_day;
-		t_Funboy[vl_lp].imie=vl_name;
-		t_Funboy[vl_lp].nazwa_dnia_urodzenia=vl_dzienUrodzin;
-		t_Funboy[vl_lp].znak_zodiaku=vl_zodiac;
-		t_Funboy[vl_lp].plec=vl_gender;
-		t_Funboy[vl_lp].horoskop_link=f_HoroskopLink(vl_zodiac);	
-
-		return true;
-	}
-	return false;
-	getch();
-}
-//-------------------------------------------------------------------------------------
-bool f_Import_z_pliku ()
-{	string lv_filename, vl_linia, vl_rozszezenie =".csv";
-	fstream plik;
-	int vl_Lp =0;
-	bool vl_CzyPoprawneDane;
-	pFunboy = &Funboy;
-
-	cin.clear();
-	cin.sync();
-	system("cls");
-	
-	cout<< "Import danych z pliku csv do glownego pliku danych"<<endl;
-	cout<< "Plik z danymi do zaimportowania musi zawierac 3 kolumny: "<<endl;
-	cout<< "nr kolejny, imie i data urodzenia w formacie yyyy-mm-dd. "<<endl;
-	cout<< "Kolumny musza byc oddzielone od siebie ';' "<<endl;
-	cout<< "Podaj nazwe pliku .csv z danymi do zaimportowania: ";
-	cin>> lv_filename;
-
-	size_t znalezionaPozycja = lv_filename.find( vl_rozszezenie );
-	if( znalezionaPozycja == std::string::npos )
-	{	lv_filename=lv_filename+vl_rozszezenie;}
-	
-		//cout << lv_filename << endl;
-
-	plik.open( lv_filename.c_str(), ios::in );
-	if( plik.good() == false )
-    {	cout << "Plik nie istnieje."<<endl;
-    	getch();
-		return false;}
-
-	while(!plik.eof())
-		{	getline(plik, vl_linia);
-			cout<<vl_linia<<endl;
-			vl_CzyPoprawneDane = f_Wytnij_Zapisz(vl_Lp, vl_linia);
-			if (vl_CzyPoprawneDane==true)
-			{	
-				if (vl_Lp==sizeof(t_Funboy)/sizeof(t_Funboy[0]))
-				{	f_Zapisz_do_pliku();
-					vl_Lp=-1;
-				}
-				vl_Lp++;
-			}
-		}
-	plik.close();
-    getch();
-return true;
-}
-//-------------------------------------------------------------------------------------
 int main()
 {	//srand(time ( 0 ) );
 
 	Cechy *pFunboy; //deklaracja wskaznika do obiektu
 	char v_znak;
 	pFunboy = &Funboy;
-	bool v_Import_z_pliku;
 
 	do
 	{
@@ -599,7 +466,7 @@ int main()
 				//f_znajdz_url();
 				break;
 			case '3':
-				v_Import_z_pliku=f_Import_z_pliku();
+				//f_wyswietl_historie();
 				break;
 			case 'W':
 				exit(0);
